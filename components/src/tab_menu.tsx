@@ -1,16 +1,19 @@
 import { JSX, signal } from '../../deps.ts'
 
 export function TabMenu(
-	{ tabs }: { tabs: [label: string, tab: JSX.Element][] },
+	{ tabs, ...props }:
+		& { tabs: [label: string, tab: JSX.Element][] }
+		& JSX.HTMLAttributes<HTMLDivElement>,
 ) {
 	const currentTab = signal(0)
 	const seed = Date.now().toString()
 
 	return (
-		<div>
-			<menu role='tablist'>
+		<div {...props}>
+			<menu role='tablist' class={`${props.class} tab-list`}>
 				{tabs.map(([label], index) => (
 					<button
+						class={`${props.class} tab-button`}
 						role='tab'
 						id={`tab-${seed}-${label}-${index}`}
 						tabIndex={currentTab.value === index ? 0 : -1}
@@ -22,9 +25,10 @@ export function TabMenu(
 					</button>
 				))}
 			</menu>
-			<div>
+			<div className={`${props.class} tab-container`}>
 				{tabs.map(([label, tab], index) => (
 					<div
+						class={`${props.class} tab-panel`}
 						role='tabpanel'
 						id={`tabpanel-${seed}-${label}-${index}`}
 						tabIndex={0}
