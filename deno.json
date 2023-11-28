@@ -1,0 +1,12 @@
+{
+	"fmt": {
+		"useTabs": true,
+		"singleQuote": true,
+		"semiColons": false,
+		"indentWidth": 4
+	},
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"jsxImportSource": "https://esm.sh/preact@10.15.1"
+	}
+}
