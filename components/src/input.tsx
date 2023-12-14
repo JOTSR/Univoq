@@ -1,4 +1,4 @@
-import { effect, JSX, signal } from '../../deps.ts'
+import { effect, JSX, useSignal } from '../../deps.ts'
 
 export function Input(
 	{ label, name, ...props }:
@@ -6,8 +6,8 @@ export function Input(
 		& JSX.HTMLAttributes<HTMLInputElement>,
 ) {
 	if (props.type === 'password') {
-		const password = signal('')
-		const hash = signal('')
+		const password = useSignal('')
+		const hash = useSignal('')
 		const salt = crypto.randomUUID()
 
 		effect(async () => {
