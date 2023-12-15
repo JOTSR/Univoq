@@ -1,12 +1,12 @@
-import { JSX, signal } from '../../deps.ts'
+import { JSX, useMemo, useSignal } from '../../deps.ts'
 
 export function TabMenu(
 	{ tabs, ...props }:
 		& { tabs: [label: string, tab: JSX.Element][] }
 		& JSX.HTMLAttributes<HTMLDivElement>,
 ) {
-	const currentTab = signal(0)
-	const seed = Date.now().toString()
+	const currentTab = useSignal(0)
+	const seed = useMemo(() => Date.now().toString(), [])
 
 	return (
 		<div {...props}>
