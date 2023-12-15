@@ -1,4 +1,4 @@
-import { effect, JSX, signal } from '../../deps.ts'
+import { effect, JSX, useEffect, useSignal } from '../../deps.ts'
 
 export function Suspense(
 	{ fallback, suspender, timeout, children }: {
@@ -8,24 +8,33 @@ export function Suspense(
 		children: Promise<JSX.Element>
 	},
 ) {
-	const displayed = signal(suspender)
+	const displayed = useSignal(suspender)
 
-	const dispose = effect(async () => {
-		try {
-			displayed.value = await children
-		} catch {
-			displayed.value = fallback
-		}
-	})
+	useEffect(() => {
+		const ac = new AbortController()
 
-	if (timeout) {
-		effect(() => {
-			setTimeout(() => {
-				dispose()
+		effect(async () => {
+			if (ac.signal.aborted) return
+			try {
+				displayed.value = await children
+			} catch {
 				displayed.value = fallback
-			}, timeout)
+			}
 		})
-	}
+
+		if (timeout) {
+			effect(() => {
+				setTimeout(() => {
+					ac.abort(new Error('promise timeout exceeded'))
+					if (displayed.value === suspender) {
+						displayed.value = fallback
+					}
+				}, timeout)
+			})
+		}
+
+		return ac.abort(new Error('component rerender'))
+	})
 
 	return <>{displayed}</>
 }
