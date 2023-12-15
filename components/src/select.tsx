@@ -4,15 +4,15 @@ export function Select(
 	{ label, name, options, ...props }: {
 		label: string
 		name: string
-		options: [label: string, value: string][]
+		options: ({ label: string } & JSX.HTMLAttributes<HTMLOptionElement>)[]
 	} & JSX.HTMLAttributes<HTMLSelectElement>,
 ) {
 	return (
 		<label>
 			<span>{label}</span>
 			<select name={name} {...props}>
-				{options.map(([label, value]) => (
-					<option value={value}>{label}</option>
+				{options.map(({ label, ...props }) => (
+					<option {...props}>{label}</option>
 				))}
 			</select>
 		</label>
