@@ -23,6 +23,7 @@ export function Input(
 				<span>{label}</span>
 				<input
 					{...props}
+					spellCheck={false}
 					onInput={(event) =>
 						password.value =
 							(event.target as HTMLInputElement).value}
