@@ -8,9 +8,7 @@ export {
 	useComputed,
 	useSignal,
 	useSignalEffect,
-} from 'https://esm.sh/@preact/signals@1.2.1?deps=preact@10.19.2'
-export type {
-	Signal,
+	type Signal
 } from 'https://esm.sh/@preact/signals@1.2.1?deps=preact@10.19.2'
 export {
 	useEffect,
