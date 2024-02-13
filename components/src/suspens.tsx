@@ -1,40 +1,48 @@
-import { effect, JSX, useEffect, useSignal } from '../../deps.ts'
+import { JSX, useSignal } from '../../deps.ts'
+
+function RenderError(
+	{ error, fallback }: { error: Error; fallback: Fallback | undefined },
+) {
+	if (fallback) {
+		return fallback({ error })
+	}
+
+	return (
+		<output>
+			<pre>{String(error)}</pre>
+		</output>
+	)
+}
+
+type Fallback = ({ error }: { error: Error }) => JSX.Element
 
 export function Suspense(
-	{ fallback, suspender, timeout, children }: {
-		fallback: JSX.Element
-		suspender: JSX.Element
-		timeout?: number
+	{ loader, fallback, signal, children }: {
+		loader: JSX.Element
 		children: Promise<JSX.Element>
+		fallback?: Fallback
+		signal?: AbortSignal
 	},
 ) {
-	const displayed = useSignal(suspender)
+	const displayed = useSignal(loader)
 
-	useEffect(() => {
-		const ac = new AbortController()
-
-		effect(async () => {
-			if (ac.signal.aborted) return
-			try {
-				displayed.value = await children
-			} catch {
-				displayed.value = fallback
-			}
-		})
-
-		if (timeout) {
-			effect(() => {
-				setTimeout(() => {
-					ac.abort(new Error('promise timeout exceeded'))
-					if (displayed.value === suspender) {
-						displayed.value = fallback
-					}
-				}, timeout)
-			})
+	signal?.addEventListener('abort', () => {
+		try {
+			signal.throwIfAborted()
+		} catch (error) {
+			displayed.value = RenderError({ error, fallback })
 		}
-
-		return ac.abort(new Error('component rerender'))
 	})
+
+	children
+		.then((element) => {
+			if (signal?.aborted) return
+			displayed.value = element
+		})
+		.catch((error) => {
+			if (signal?.aborted) return
+			displayed.value = RenderError({ error, fallback })
+		})
 
 	return <>{displayed}</>
 }
